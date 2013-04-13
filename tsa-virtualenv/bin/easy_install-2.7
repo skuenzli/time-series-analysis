@@ -1,0 +1,12 @@
+#!/usr/bin/env python2.7
+
+import os; activate_this=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'activate_this.py'); execfile(activate_this, dict(__file__=activate_this)); del os, activate_this
+
+# EASY-INSTALL-ENTRY-SCRIPT: 'setuptools==0.6c11','console_scripts','easy_install-2.7'
+__requires__ = 'setuptools==0.6c11'
+import sys
+from pkg_resources import load_entry_point
+
+sys.exit(
+   load_entry_point('setuptools==0.6c11', 'console_scripts', 'easy_install-2.7')()
+)
