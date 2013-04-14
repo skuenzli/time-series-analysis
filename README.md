@@ -16,7 +16,7 @@ _analyze_series_ will analyze the points in the provided series and print the fo
 * points and associated values falling outside of control limits
 
 _analyze_series_ can be used to help implement a run-by-run control program using [Control Charts](http://en.wikipedia.org/wiki/Control_chart).  _analyze_series_ currently supports ['Rule 1'](http://en.wikipedia.org/wiki/Western_Electric_rules) testing for points that are 
-+/- 3-sigma from the series' mean.  Support for detecting suspicious runs above/below the mean is planned (issue #3).
++/- 3-sigma from the series' mean.  Support for detecting suspicious runs above/below the mean is planned (issue [#3](https://github.com/skuenzli/time-series-analysis/issues/3)).
 
 ### Usage
 execute analyze_series -h for full usage details.
