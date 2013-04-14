@@ -9,6 +9,11 @@ The _analyze_series_ command is meant to be used in the command-line in typical 
 * input on standard input or as a file argument to analyze_series
 
 ### Usage
+execute analyze_series -h for full usage details.
+
+excerpt:
+
+````
 usage: analyze_series [-h] [-v] [--assert-last-point-in-control] [input_file]
 
 positional arguments:
@@ -21,6 +26,7 @@ optional arguments:
                         assert the last point in the series is in-control and
                         exit with status code '2' if last point is not in
                         control
+````
 
 ### Examples
 
