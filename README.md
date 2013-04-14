@@ -77,3 +77,14 @@ points outside of ucl: [(27, 4.0)]
 stderr: last point (index=27, value=4.0) is out of control
 exit status: 1
 ````
+
+Acknowledgement and Thanks
+--------------------------
+The time-series-analysis project builds-upon and is made-easy by the wonderful work of:
+
+* [Python] (http://www.python.org)
+* [NumPy] (http://www.numpy.org) - the fundamental package for scientific computing with Python
+* [pandas] (http://pandas.pydata.org) - provides high-performance, easy-to-use data structures and data analysis tools for Python
+
+
+Thank you!
