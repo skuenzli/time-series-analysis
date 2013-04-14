@@ -9,31 +9,33 @@ import xmlrunner
 
 from time_series_analysis import ControlChart, AnalyzeSeriesCommand
 
+SERIES_UNDER_CONTROL = (
+    10.0, 9.0, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 11, 10.5
+)
+
+SERIES_WITH_UCL_OUTLIERS = (
+    -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , 4
+)
+
+SERIES_WITH_LCL_OUTLIERS = (
+    -4
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+)
+
 class ControlChartTest(unittest.TestCase):
 
     # calculated values sourced from wolfram alpha
 
     def setUp(self):
-        self.series_under_control = [
-            10.0, 9.0, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 11, 10.5
-        ]
-
-        self.series_with_ucl_outliers = [
-            -1, 0, 1, -1, 0, 1, -1, 0, 1
-            , -1, 0, 1, -1, 0, 1, -1, 0, 1
-            , -1, 0, 1, -1, 0, 1, -1, 0, 1
-            , 4
-        ]
-
-        self.series_with_lcl_outliers = [
-            -4
-            , -1, 0, 1, -1, 0, 1, -1, 0, 1
-            , -1, 0, 1, -1, 0, 1, -1, 0, 1
-            , -1, 0, 1, -1, 0, 1, -1, 0, 1
-        ]
+        pass
 
     def test_series_under_control(self):
-        chart = ControlChart(self.series_under_control)
+        chart = ControlChart(SERIES_UNDER_CONTROL)
 
         self.assertEquals(10.05, chart.mean())
         self.assertEquals(10.05, chart.median())
@@ -46,28 +48,28 @@ class ControlChartTest(unittest.TestCase):
         self.assertEquals([], chart.points_outside_ucl())
 
     def test_points_outside_lcl_are_identified(self):
-        chart = ControlChart(self.series_with_lcl_outliers)
+        chart = ControlChart(SERIES_WITH_LCL_OUTLIERS)
 
         index = 0
         value = -4
         self.assertIn((index, value), chart.points_outside_lcl())
 
     def test_points_outside_ucl_are_identified(self):
-        chart = ControlChart(self.series_with_ucl_outliers)
+        chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
 
         index = 27
         value = 4
         self.assertIn((index, value), chart.points_outside_ucl())
 
     def test_chart_computes_sample_statistics(self):
-        chart = ControlChart(self.series_with_ucl_outliers)
+        chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
 
         self.assertAlmostEqual(0.1429, chart.mean(), places=4)
         self.assertEquals(0, chart.median())
         self.assertAlmostEqual(1.113, chart.std_dev(), places=3)
 
     def test_chart_computes_control_limits(self):
-        chart = ControlChart(self.series_with_ucl_outliers)
+        chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
 
         (lcl, ucl) = chart.control_limits()
 
@@ -82,7 +84,6 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
 
     def setUp(self):
         self._analyze_series_cmd = AnalyzeSeriesCommand()
-        self._series = [ 10, 9, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 8.75, 10.5 ]
 
     def test_properties_when_no_arguments_provided(self):
         sys.argv = ["analyze_series"]
@@ -119,10 +120,10 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
 
     def test_data_series_is_analyzed(self):
         tf = tempfile.NamedTemporaryFile()
-        control_chart = ControlChart(self._series)
+        control_chart = ControlChart(SERIES_UNDER_CONTROL)
 
         input = ""
-        for val in self._series:
+        for val in SERIES_UNDER_CONTROL:
             input += " {} \n".format(str(val))
 
         tf.write(input)
