@@ -1,0 +1,9 @@
+#!tsa-virtualenv/bin/python
+import sys
+from time_series_analysis import AnalyzeSeriesCommand
+
+
+if __name__ == '__main__':
+    analyze_series_command = AnalyzeSeriesCommand()
+
+    sys.exit(analyze_series_command.execute())

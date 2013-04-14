@@ -1,7 +1,13 @@
+#!tsa-virtualenv/bin/python
+
+from random import choice
+import sys
 import unittest
+import tempfile
+from mock import MagicMock
 import xmlrunner
 
-from time_series_analysis import ControlChart
+from time_series_analysis import ControlChart, AnalyzeSeriesCommand
 
 class ControlChartTest(unittest.TestCase):
 
@@ -55,10 +61,49 @@ class ControlChartTest(unittest.TestCase):
         self.assertAlmostEqual(ucl, 3.4809, places=4)
 
 
+class AnalyzeSeriesCommandTest(unittest.TestCase):
+
+    def setUp(self):
+        self._analyze_series_cmd = AnalyzeSeriesCommand()
+
+    def test_properties_when_no_arguments_provided(self):
+        sys.argv = ["analyze_series"]
+        cmd = AnalyzeSeriesCommand()
+
+        cmd._parse_options()
+
+        self.assertEquals(sys.stdin, cmd._input_file)
+        self.assertFalse(cmd._verbose)
+
+    def test_properties_when_arguments_provided(self):
+        tf = tempfile.NamedTemporaryFile(mode="r")
+
+        sys.argv = ["analyze_series", tf.name]
+
+        verbosity = choice([True, False])
+        if verbosity:
+            sys.argv.append("--verbose")
+
+        cmd = AnalyzeSeriesCommand()
+
+        cmd._parse_options()
+
+        self.assertEquals(tf.name, cmd._input_file.name)
+        self.assertEquals(verbosity, cmd._verbose)
+
+    def test_parseOptions_called_when_executed(self):
+        mock_parse_options = MagicMock()
+        self._analyze_series_cmd._parse_options = mock_parse_options
+
+        self._analyze_series_cmd.execute()
+
+        mock_parse_options.assert_called_once_with()
+
+
 def suite():
     test_suite = unittest.TestSuite()
 
-    for test_class in [ControlChartTest]:
+    for test_class in [ControlChartTest, AnalyzeSeriesCommandTest]:
         test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_class))
 
     return test_suite
