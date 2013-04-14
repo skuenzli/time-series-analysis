@@ -16,8 +16,8 @@ SERIES_UNDER_CONTROL = (
 SERIES_WITH_UCL_OUTLIERS = (
     -1, 0, 1, -1, 0, 1, -1, 0, 1
     , -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
     , 4
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
 )
 
 SERIES_WITH_LCL_OUTLIERS = (
@@ -26,6 +26,16 @@ SERIES_WITH_LCL_OUTLIERS = (
     , -1, 0, 1, -1, 0, 1, -1, 0, 1
     , -1, 0, 1, -1, 0, 1, -1, 0, 1
 )
+
+SERIES_WITH_LAST_POINT_OOC= (
+    -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , -1, 0, 1, -1, 0, 1, -1, 0, 1
+    , 4
+)
+
+def random_bool():
+    return choice([True, False])
 
 class ControlChartTest(unittest.TestCase):
 
@@ -57,9 +67,27 @@ class ControlChartTest(unittest.TestCase):
     def test_points_outside_ucl_are_identified(self):
         chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
 
-        index = 27
+        index = 18
         value = 4
         self.assertIn((index, value), chart.points_outside_ucl())
+
+    def test_get_last_point(self):
+        chart = ControlChart(SERIES_UNDER_CONTROL)
+
+        last_index = len(SERIES_UNDER_CONTROL) - 1
+        expected_last_point = (last_index, SERIES_UNDER_CONTROL[last_index])
+
+        last_point = chart.get_last_point()
+        print "expected_last_point: {}".format(expected_last_point)
+        print "last_point: {}".format(last_point)
+        self.assertEquals(expected_last_point, last_point)
+
+    def test_points_is_last_point_in_control_does_not_generate_false_positives_when_outliers_exist_but_are_not_last(self):
+        chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
+
+        chart_points_outside_ucl = chart.points_outside_ucl()
+        self.assertGreater(len(chart_points_outside_ucl), 0)
+        self.assertTrue(chart.is_last_point_in_control())
 
     def test_chart_computes_sample_statistics(self):
         chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
@@ -89,19 +117,25 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
         sys.argv = ["analyze_series"]
         cmd = AnalyzeSeriesCommand()
 
+        self.assertIsNotNone(cmd._argument_parser)
         cmd._parse_options()
 
         self.assertEquals(sys.stdin, cmd._input_file)
         self.assertFalse(cmd._verbose)
+
 
     def test_properties_when_arguments_provided(self):
         tf = tempfile.NamedTemporaryFile(mode="r")
 
         sys.argv = ["analyze_series", tf.name]
 
-        verbosity = choice([True, False])
+        verbosity = random_bool()
         if verbosity:
             sys.argv.append("--verbose")
+
+        assert_last_point_in_control = random_bool()
+        if assert_last_point_in_control:
+            sys.argv.append("--assert-last-point-in-control")
 
         cmd = AnalyzeSeriesCommand()
 
@@ -109,6 +143,7 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
 
         self.assertEquals(tf.name, cmd._input_file.name)
         self.assertEquals(verbosity, cmd._verbose)
+        self.assertEquals(assert_last_point_in_control, cmd._assert_last_point_in_control)
 
     def test_parseOptions_called_when_executed(self):
         mock_parse_options = MagicMock()
@@ -131,12 +166,50 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
 
         sys.argv = ["analyze_series", tf.name, "--verbose"]
 
-        status = self._analyze_series_cmd.execute()
+        (status, message) = self._analyze_series_cmd.execute()
 
         self.assertEquals(AnalyzeSeriesCommand.STATUS_SUCCESS, status)
+        self.assertEquals("", message)
+
         expected_mean = control_chart.mean()
         actual_mean = self._analyze_series_cmd._control_chart.mean()
         self.assertAlmostEquals(expected_mean, actual_mean, places=3)
+
+    def test_status_codes_are_reasonable(self):
+        self.assertEquals(0, AnalyzeSeriesCommand.STATUS_SUCCESS)
+
+        self.assertLess(0, AnalyzeSeriesCommand.STATUS_ASSERTION_FAILED)
+        self.assertLess(0, AnalyzeSeriesCommand.STATUS_ERROR_IO)
+
+    def test_exit_status_when_assert_last_point_in_control_not_set_and_out_of_control(self):
+        self._analyze_series_cmd._read_data_from_file = MagicMock(return_value=SERIES_WITH_UCL_OUTLIERS)
+        sys.argv = ["analyze_series"]
+
+        (status, message) = self._analyze_series_cmd.execute()
+
+        self.assertFalse(self._analyze_series_cmd._assert_last_point_in_control)
+        self.assertEquals(AnalyzeSeriesCommand.STATUS_SUCCESS, status)
+        self.assertEquals('', message)
+
+    def test_exit_status_when_assert_last_point_in_control_is_set_and_non_last_point_out_of_control(self):
+        self._analyze_series_cmd._read_data_from_file = MagicMock(return_value=SERIES_WITH_UCL_OUTLIERS)
+        sys.argv = ["analyze_series", "--assert-last-point-in-control"]
+
+        (status, message) = self._analyze_series_cmd.execute()
+
+        self.assertTrue(self._analyze_series_cmd._assert_last_point_in_control)
+        self.assertEquals(AnalyzeSeriesCommand.STATUS_SUCCESS, status)
+        self.assertEquals('', message)
+
+    def test_exit_status_when_assert_last_point_in_control_is_set_and_last_point_out_of_control(self):
+        self._analyze_series_cmd._read_data_from_file = MagicMock(return_value=SERIES_WITH_LAST_POINT_OOC)
+        sys.argv = ["analyze_series", "--assert-last-point-in-control"]
+
+        (status, message) = self._analyze_series_cmd.execute()
+
+        self.assertTrue(self._analyze_series_cmd._assert_last_point_in_control)
+        self.assertEquals(AnalyzeSeriesCommand.STATUS_ASSERTION_FAILED, status)
+        self.assertIsNotNone(message)
 
 def suite():
     test_suite = unittest.TestSuite()

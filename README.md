@@ -9,14 +9,18 @@ The _analyze_series_ command is meant to be used in the command-line in typical 
 * input on standard input or as a file argument to analyze_series
 
 ### Usage
-analyze_series [-h] [-v] [input_file]
+usage: analyze_series [-h] [-v] [--assert-last-point-in-control] [input_file]
 
 positional arguments:
-  input_file     input file to process, defaults to standard input
+  input_file            input file to process, defaults to standard input
 
 optional arguments:
-  -h, --help     show this help message and exit
-  -v, --verbose  print additional debug information
+  -h, --help            show this help message and exit
+  -v, --verbose         print additional debug information
+  --assert-last-point-in-control
+                        assert the last point in the series is in-control and
+                        exit with status code '2' if last point is not in
+                        control
 
 ### Examples
 
@@ -40,6 +44,20 @@ mean: 10.05
 std dev: 0.873689494805
 lower control limit: 7.42893151558
 upper control limit: 12.6710684844
-points outside of lcl: []
-points outside of ucl: []
+points outside of lcl: None
+points outside of ucl: None
+````
+
+Analyze data and return error if last point is not in control:
+````bash
+$ cat resources/examples/upper_control_limit_violation.txt | ./analyze_series --assert-last-point-in-control; echo "exit status: $?"
+median: 0.0
+mean: 0.142857142857
+std dev: 1.11269728053
+lower control limit: -3.19523469873
+upper control limit: 3.48094898444
+points outside of lcl: None
+points outside of ucl: [(27, 4.0)]
+stderr: last point (index=27, value=4.0) is out of control
+exit status: 1
 ````
