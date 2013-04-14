@@ -8,6 +8,16 @@ The _analyze_series_ command is meant to be used in the command-line in typical 
 * one number per line
 * input on standard input or as a file argument to analyze_series
 
+_analyze_series_ will analyze the points in the provided series and print the following descriptive statistics:
+
+* median
+* mean, sample standard deviation
+* upper and lower control limits
+* points and associated values falling outside of control limits
+
+_analyze_series_ can be used to help implement a run-by-run control program using [Control Charts](http://en.wikipedia.org/wiki/Control_chart).  _analyze_series_ currently supports ['Rule 1'](http://en.wikipedia.org/wiki/Western_Electric_rules) testing for points that are 
++/- 3-sigma from the series' mean.  Support for detecting suspicious runs above/below the mean is planned (issue #3).
+
 ### Usage
 execute analyze_series -h for full usage details.
 
