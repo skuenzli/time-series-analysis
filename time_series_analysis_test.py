@@ -14,6 +14,10 @@ class ControlChartTest(unittest.TestCase):
     # calculated values sourced from wolfram alpha
 
     def setUp(self):
+        self.series_under_control = [
+            10.0, 9.0, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 11, 10.5
+        ]
+
         self.series_with_ucl_outliers = [
             -1, 0, 1, -1, 0, 1, -1, 0, 1
             , -1, 0, 1, -1, 0, 1, -1, 0, 1
@@ -27,6 +31,19 @@ class ControlChartTest(unittest.TestCase):
             , -1, 0, 1, -1, 0, 1, -1, 0, 1
             , -1, 0, 1, -1, 0, 1, -1, 0, 1
         ]
+
+    def test_series_under_control(self):
+        chart = ControlChart(self.series_under_control)
+
+        self.assertEquals(10.05, chart.mean())
+        self.assertEquals(10.05, chart.median())
+        self.assertAlmostEquals(0.8737, chart.std_dev(), places=4)
+
+        self.assertAlmostEquals(7.429, chart.lower_control_limit(), places=3)
+        self.assertAlmostEquals(12.671, chart.upper_control_limit(), places=3)
+
+        self.assertEquals([], chart.points_outside_lcl())
+        self.assertEquals([], chart.points_outside_ucl())
 
     def test_points_outside_lcl_are_identified(self):
         chart = ControlChart(self.series_with_lcl_outliers)
@@ -65,6 +82,7 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
 
     def setUp(self):
         self._analyze_series_cmd = AnalyzeSeriesCommand()
+        self._series = [ 10, 9, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 8.75, 10.5 ]
 
     def test_properties_when_no_arguments_provided(self):
         sys.argv = ["analyze_series"]
@@ -99,6 +117,25 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
 
         mock_parse_options.assert_called_once_with()
 
+    def test_data_series_is_analyzed(self):
+        tf = tempfile.NamedTemporaryFile()
+        control_chart = ControlChart(self._series)
+
+        input = ""
+        for val in self._series:
+            input += " {} \n".format(str(val))
+
+        tf.write(input)
+        tf.flush()
+
+        sys.argv = ["analyze_series", tf.name, "--verbose"]
+
+        status = self._analyze_series_cmd.execute()
+
+        self.assertEquals(AnalyzeSeriesCommand.STATUS_SUCCESS, status)
+        expected_mean = control_chart.mean()
+        actual_mean = self._analyze_series_cmd._control_chart.mean()
+        self.assertAlmostEquals(expected_mean, actual_mean, places=3)
 
 def suite():
     test_suite = unittest.TestSuite()
