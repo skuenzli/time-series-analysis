@@ -39,7 +39,7 @@ class ControlChart:
 class AnalyzeSeriesCommand():
 
     STATUS_SUCCESS = 0
-    STATUS_ERROR_IO = 1
+    STATUS_ERROR_IO = 74
 
     _input_file = None
     _verbose = False
