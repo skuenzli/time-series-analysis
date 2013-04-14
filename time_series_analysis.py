@@ -46,9 +46,20 @@ class AnalyzeSeriesCommand():
     _control_chart = None
 
     def _parse_options(self):
-        parser = argparse.ArgumentParser(description='Analyze a series of points.')
-        parser.add_argument('input_file', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
-        parser.add_argument('--verbose', '-v', action='store_true')
+        description = """analyze a series of points and print descriptive statistics"""
+        epilog = """analyze_series supports:
+  * integer and floating-point numbers
+  * positive and negative numbers
+  * whitespace around the number
+  * statistics useful for analysis of time-series data:
+    * median
+    * mean, sample standard deviation
+    * upper and lower control limits
+    * points and associated value falling outside of control limits"""
+        parser = argparse.ArgumentParser(description=description, epilog=epilog, formatter_class=argparse.RawDescriptionHelpFormatter)
+        parser.add_argument('input_file', nargs='?', type=argparse.FileType('r'),
+            default=sys.stdin, help="input file to process, defaults to standard input")
+        parser.add_argument('-v', '--verbose', action='store_true', help='print additional debug information')
 
         args = parser.parse_args()
         self._input_file = args.input_file
