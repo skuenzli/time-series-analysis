@@ -7,7 +7,7 @@ import tempfile
 from mock import MagicMock
 import xmlrunner
 
-from time_series_analysis import ControlChart, AnalyzeSeriesCommand
+from tools import ControlChart, AnalyzeSeriesCommand
 
 SERIES_UNDER_CONTROL = (
     10.0, 9.0, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 11, 10.5
