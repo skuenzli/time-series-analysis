@@ -9,33 +9,22 @@ import xmlrunner
 
 from time_series_analysis.tools import ControlChart, AnalyzeSeriesCommand
 
-SERIES_UNDER_CONTROL = (
-    10.0, 9.0, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 11, 10.5
-)
+SERIES_UNDER_CONTROL = (10.0, 9.0, 8.5, 11.5, 10.25, 9.75, 10.1, 9.9, 11, 10.5)
 
-SERIES_WITH_UCL_OUTLIERS = (
-    -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , 4
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-)
+SERIES_WITH_UCL_OUTLIERS = (-1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1,
+                            4,
+                            -1, 0, 1, -1, 0, 1, -1, 0, 1)
 
-SERIES_WITH_LCL_OUTLIERS = (
-    -4
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-)
+SERIES_WITH_LCL_OUTLIERS = (-4,
+                            -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1)
 
-SERIES_WITH_LAST_POINT_OOC= (
-    -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , -1, 0, 1, -1, 0, 1, -1, 0, 1
-    , 4
-)
+SERIES_WITH_LAST_POINT_OOC = (-1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1,
+                              4)
+
 
 def random_bool():
     return choice([True, False])
+
 
 class ControlChartTest(unittest.TestCase):
 
@@ -82,7 +71,7 @@ class ControlChartTest(unittest.TestCase):
         print "last_point: {}".format(last_point)
         self.assertEquals(expected_last_point, last_point)
 
-    def test_points_is_last_point_in_control_does_not_generate_false_positives_when_outliers_exist_but_are_not_last(self):
+    def test_is_last_point_in_control_does_not_generate_false_positives_when_outliers_exist_but_are_not_last(self):
         chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
 
         chart_points_outside_ucl = chart.points_outside_ucl()
@@ -123,7 +112,6 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
         self.assertEquals(sys.stdin, cmd._input_file)
         self.assertFalse(cmd._verbose)
 
-
     def test_properties_when_arguments_provided(self):
         tf = tempfile.NamedTemporaryFile(mode="r")
 
@@ -157,11 +145,11 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
         tf = tempfile.NamedTemporaryFile()
         control_chart = ControlChart(SERIES_UNDER_CONTROL)
 
-        input = ""
+        test_input = ""
         for val in SERIES_UNDER_CONTROL:
-            input += " {} \n".format(str(val))
+            test_input += " {} \n".format(str(val))
 
-        tf.write(input)
+        tf.write(test_input)
         tf.flush()
 
         sys.argv = ["analyze_series", tf.name, "--verbose"]
@@ -210,6 +198,7 @@ class AnalyzeSeriesCommandTest(unittest.TestCase):
         self.assertTrue(self._analyze_series_cmd._assert_last_point_in_control)
         self.assertEquals(AnalyzeSeriesCommand.STATUS_ASSERTION_FAILED, status)
         self.assertIsNotNone(message)
+
 
 def suite():
     test_suite = unittest.TestSuite()
