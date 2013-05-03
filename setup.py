@@ -9,9 +9,12 @@ setup(
     url='https://github.com/skuenzli/time-series-analysis',
     author='Stephen Kuenzli',
     license='Apache 2.0',
-    packages=['time-series-analysis'],
+    packages=['time_series_analysis'],
     zip_safe=False,
     test_suite='nose.collector',
     require=['numpy', 'pandas'],
+    entry_points=dict(
+        console_scripts=['analyze_series=time_series_analysis.console:main']
+    ),
     tests_require=['nose', 'mock', 'unittest-xml-reporting']
 )

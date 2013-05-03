@@ -1,9 +1,9 @@
-#!tsa-virtualenv/bin/python
+#!/usr/bin/env python
 import sys
-from time_series_analysis import AnalyzeSeriesCommand
 
+from tools import AnalyzeSeriesCommand
 
-if __name__ == '__main__':
+def main():
     analyze_series_command = AnalyzeSeriesCommand()
 
     (status, message) = analyze_series_command.execute()
