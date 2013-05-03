@@ -1,3 +1,9 @@
+# ignore standard git repo-specific config
+config
+
+# ignore a local virtualenv dir
+.env
+
 # based on https://raw.github.com/github/gitignore/master/Python.gitignore
 *.py[cod]
 
