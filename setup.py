@@ -12,5 +12,6 @@ setup(
     packages=['time-series-analysis'],
     zip_safe=False,
     test_suite='nose.collector',
-    tests_require=['nose', 'mock']
+    require=['numpy', 'pandas'],
+    tests_require=['nose', 'mock', 'unittest-xml-reporting']
 )
