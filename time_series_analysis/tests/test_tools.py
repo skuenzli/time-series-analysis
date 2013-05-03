@@ -1,4 +1,4 @@
-#!tsa-virtualenv/bin/python
+#!/usr/bin/env python
 
 from random import choice
 import sys
