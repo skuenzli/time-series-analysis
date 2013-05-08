@@ -71,6 +71,18 @@ class ControlChartTest(unittest.TestCase):
         print "last_point: {}".format(last_point)
         self.assertEquals(expected_last_point, last_point)
 
+    def test_chart_handles_get_last_point_on_empty_series_gracefully(self):
+        series = ()
+        chart = ControlChart(series)
+
+        self.assertIsNone(chart.get_last_point())
+
+    def test_chart_can_get_last_point_when_only_one_point_exists(self):
+        series = (42,)
+        chart = ControlChart(series)
+
+        self.assertEquals((0, 42), chart.get_last_point())
+
     def test_is_last_point_in_control_does_not_generate_false_positives_when_outliers_exist_but_are_not_last(self):
         chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
 
@@ -97,13 +109,6 @@ class ControlChartTest(unittest.TestCase):
 
         self.assertAlmostEqual(lcl, -3.1952, places=4)
         self.assertAlmostEqual(ucl, 3.4809, places=4)
-
-    def test_chart_handles_get_last_point_on_empty_series_gracefully(self):
-        series = ()
-        chart = ControlChart(series)
-
-        self.assertIsNone(chart.get_last_point())
-
 
 class AnalyzeSeriesCommandTest(unittest.TestCase):
 
