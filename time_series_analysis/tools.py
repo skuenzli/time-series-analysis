@@ -38,8 +38,11 @@ class ControlChart:
 
     def get_last_point(self):
         last_index = self._series.last_valid_index()
-        last_value = self._series.get_value(last_index)
-        return (last_index, last_value)
+        if last_index:
+            last_value = self._series.get_value(last_index)
+            return (last_index, last_value)
+        else:
+            return None
 
     def is_last_point_in_control(self):
         (index, value) = self.get_last_point()

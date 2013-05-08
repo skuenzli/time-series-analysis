@@ -98,6 +98,12 @@ class ControlChartTest(unittest.TestCase):
         self.assertAlmostEqual(lcl, -3.1952, places=4)
         self.assertAlmostEqual(ucl, 3.4809, places=4)
 
+    def test_chart_handles_get_last_point_on_empty_series_gracefully(self):
+        series = ()
+        chart = ControlChart(series)
+
+        self.assertIsNone(chart.get_last_point())
+
 
 class AnalyzeSeriesCommandTest(unittest.TestCase):
 
