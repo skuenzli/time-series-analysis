@@ -79,11 +79,13 @@ class ControlChartTest(unittest.TestCase):
         self.assertTrue(chart.is_last_point_in_control())
 
     def test_chart_computes_sample_statistics(self):
-        chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)
+        series = (1, 2, 2, 3, 3, 3, 2, 2, 1)
+        chart = ControlChart(series)
 
-        self.assertAlmostEqual(0.1429, chart.mean(), places=4)
-        self.assertEquals(0, chart.median())
-        self.assertAlmostEqual(1.113, chart.std_dev(), places=3)
+        self.assertAlmostEqual(2.1111, chart.mean(), places=4)
+        self.assertEquals(2, chart.median())
+        self.assertAlmostEqual(0.78173, chart.std_dev(), places=3)
+        self.assertEquals(len(series), chart.count())
 
     def test_chart_computes_control_limits(self):
         chart = ControlChart(SERIES_WITH_UCL_OUTLIERS)

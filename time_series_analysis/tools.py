@@ -45,6 +45,9 @@ class ControlChart:
         (index, value) = self.get_last_point()
         return self.lower_control_limit() <= value <= self.upper_control_limit()
 
+    def count(self):
+        return self._series.count()
+
 
 class AnalyzeSeriesCommand():
 
