@@ -4,7 +4,7 @@ import multiprocessing
 
 setup(
     name='time-series-analysis',
-    version='0.1.3-dev',
+    version='0.1.3',
     description='Contains tools for analyzing time-series data on the command-line.',
     url='https://github.com/skuenzli/time-series-analysis',
     author='Stephen Kuenzli',
